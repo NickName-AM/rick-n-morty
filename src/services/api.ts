@@ -12,6 +12,8 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = 'ApiError';
+    // Required to restore prototype chain broken by TS/Babel ES5 transpilation
+    Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
 
