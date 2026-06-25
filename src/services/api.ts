@@ -31,7 +31,7 @@ export async function apiGet<T>(
 
   if (params) {
     Object.entries(params).forEach(([key, val]) => {
-      if (val !== undefined && val !== '' && val !== null) {
+      if (val !== undefined && val !== '') {
         url.searchParams.set(key, String(val));
       }
     });
