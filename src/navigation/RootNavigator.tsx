@@ -9,6 +9,8 @@ import { colors } from '../theme/colors';
 import type { RootTabParamList } from './types';
 import HomeStackNavigator from './HomeStackNavigator';
 import SearchStackNavigator from './SearchStackNavigator';
+import SavedScreen from '../screens/SavedScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 // Activate native screen optimization before any navigator renders.
 enableScreens();
@@ -43,6 +45,34 @@ export default function RootNavigator() {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="search-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Saved"
+          component={SavedScreen}
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.textPrimary,
+            headerTitleStyle: { fontFamily: 'Inter_600SemiBold' },
+            title: 'Saved',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="bookmark-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.textPrimary,
+            headerTitleStyle: { fontFamily: 'Inter_600SemiBold' },
+            title: 'Profile',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person-outline" size={size} color={color} />
             ),
           }}
         />
