@@ -1,6 +1,5 @@
-// src/store/filterSlice.ts
 // Zustand v5 filter slice — status + searchQuery + actions.
-// Phase 3 adds characterSlice alongside this; the AppStore union expands there.
+// Holds filter UI state only; character data lives in the TanStack Query cache.
 
 import { StateCreator } from 'zustand';
 import type { FilterStatus } from '../types/app';
