@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import type { RootTabParamList } from './types';
 import HomeStackNavigator from './HomeStackNavigator';
-import CharactersScreen from '../screens/CharactersScreen';
+import SearchStackNavigator from './SearchStackNavigator';
 
 // Activate native screen optimization before any navigator renders.
 enableScreens();
@@ -39,10 +39,10 @@ export default function RootNavigator() {
         />
         <Tab.Screen
           name="Search"
-          component={CharactersScreen as React.ComponentType<object>}
+          component={SearchStackNavigator}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="people-outline" size={size} color={color} />
+              <Ionicons name="search-outline" size={size} color={color} />
             ),
           }}
         />
