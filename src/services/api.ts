@@ -26,6 +26,7 @@ export class ApiError extends Error {
 export async function apiGet<T>(
   path: string,
   params?: Record<string, string | number | undefined>,
+  signal?: AbortSignal,
 ): Promise<T> {
   const url = new URL(`${BASE_URL}${path}`);
 
@@ -37,7 +38,7 @@ export async function apiGet<T>(
     });
   }
 
-  const response = await fetch(url.toString());
+  const response = await fetch(url.toString(), { signal });
 
   if (!response.ok) {
     throw new ApiError(
