@@ -44,5 +44,11 @@ export async function apiGet<T>(
     );
   }
 
-  return response.json() as Promise<T>;
+  let data: unknown;
+  try {
+    data = await response.json();
+  } catch {
+    throw new ApiError(response.status, `Failed to parse API response as JSON`);
+  }
+  return data as T;
 }
