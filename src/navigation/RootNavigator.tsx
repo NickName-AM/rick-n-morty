@@ -6,13 +6,14 @@ import { enableScreens } from 'react-native-screens';
 import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '../theme/colors';
-import HomeScreen from '../screens/HomeScreen';
+import type { RootTabParamList } from './types';
+import HomeStackNavigator from './HomeStackNavigator';
 import CharactersScreen from '../screens/CharactersScreen';
 
 // Activate native screen optimization before any navigator renders.
 enableScreens();
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function RootNavigator() {
   return (
@@ -20,9 +21,7 @@ export default function RootNavigator() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.textPrimary,
-          headerTitleStyle: { fontFamily: 'Inter_600SemiBold' },
+          headerShown: false,
           tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.border },
           tabBarActiveTintColor: colors.tabBarActive,
           tabBarInactiveTintColor: colors.tabBarInactive,
@@ -31,7 +30,7 @@ export default function RootNavigator() {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={HomeStackNavigator}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
@@ -39,8 +38,8 @@ export default function RootNavigator() {
           }}
         />
         <Tab.Screen
-          name="Characters"
-          component={CharactersScreen}
+          name="Search"
+          component={CharactersScreen as React.ComponentType<object>}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="people-outline" size={size} color={color} />
