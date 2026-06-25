@@ -3,7 +3,6 @@
 // Phase 3 adds characterSlice alongside this; the AppStore union expands there.
 
 import { StateCreator } from 'zustand';
-import type { AppStore } from './index';
 import type { FilterStatus } from '../types/app';
 
 export interface FilterSlice {
@@ -17,7 +16,7 @@ export interface FilterSlice {
   resetFilters: () => void;
 }
 
-export const createFilterSlice: StateCreator<AppStore, [], [], FilterSlice> = (set) => ({
+export const createFilterSlice: StateCreator<FilterSlice, [], [], FilterSlice> = (set) => ({
   status: 'all',
   searchQuery: '',
   setStatus: (status) => set({ status }),
