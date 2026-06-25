@@ -7,8 +7,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0D1117",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D1117"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.ricknmortyexplorer"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +24,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.ricknmortyexplorer"
     },
     "web": {
       "favicon": "./assets/favicon.png"
