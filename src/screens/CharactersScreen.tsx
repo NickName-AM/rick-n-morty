@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,13 +19,27 @@ import type { Character } from '../types/api';
 export default function CharactersScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<SearchStackParamList>>();
 
-  const { data, isLoading, isError, refetch } = useCharacters();
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCharacters();
   const status = useAppStore((s) => s.status);
   const setStatus = useAppStore((s) => s.setStatus);
   const resetFilters = useAppStore((s) => s.resetFilters);
 
   const characters = data?.pages.flatMap((p) => p.results) ?? [];
   const totalCount = data?.pages[0]?.info.count ?? 0;
+
+  const handleEndReached = React.useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const renderItem = ({ item }: { item: Character }) => (
     <CharacterCard
@@ -66,6 +80,13 @@ export default function CharactersScreen() {
               <Text style={styles.count}>{totalCount} characters</Text>
             )}
           </View>
+        }
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator color={colors.accent} style={styles.footer} />
+          ) : null
         }
         ListEmptyComponent={
           isLoading ? (
@@ -118,5 +139,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Inter_600SemiBold',
     color: colors.textPrimary,
+  },
+  footer: {
+    paddingVertical: 16,
   },
 });
