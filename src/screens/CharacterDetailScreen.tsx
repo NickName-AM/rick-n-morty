@@ -17,6 +17,26 @@ import type { HomeStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'CharacterDetail'>;
 
+function formatCreatedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.metaRow}>
+      <Text style={styles.metaLabel}>{label}</Text>
+      <Text style={styles.metaValue} numberOfLines={1}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
 export default function CharacterDetailScreen({ route, navigation }: Props) {
   const { character, episodes, isLoading, isError, refetch } = useCharacterDetail(
     route.params.characterId,
@@ -50,6 +70,17 @@ export default function CharacterDetailScreen({ route, navigation }: Props) {
         <View style={styles.headerRow}>
           <Text style={styles.name}>{character.name}</Text>
           <StatusBadge status={character.status} />
+        </View>
+
+        <View style={styles.metaSection}>
+          <MetaRow label="Species" value={character.species} />
+          <MetaRow label="Gender" value={character.gender} />
+          <MetaRow label="Origin" value={character.origin.name} />
+          <MetaRow label="Location" value={character.location.name} />
+          <MetaRow label="Created" value={formatCreatedDate(character.created)} />
+          {character.type !== '' && (
+            <MetaRow label="Type" value={character.type} />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -88,5 +119,33 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Inter_700Bold',
     flex: 1,
+  },
+  metaSection: {
+    marginTop: 24,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+    gap: 16,
+  },
+  metaLabel: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  metaValue: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    flexShrink: 1,
+    textAlign: 'right',
   },
 });
