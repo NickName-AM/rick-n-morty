@@ -1,76 +1,156 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import {
+  CharacterCard,
+  FilterTabs,
+  SkeletonCard,
+  ErrorCard,
+  SearchBarInput,
+} from '../components';
 import { useCharacters } from '../hooks/useCharacters';
 import { useAppStore } from '../store';
 import { colors } from '../theme/colors';
 import type { SearchStackParamList } from '../navigation/types';
+import type { Character } from '../types/api';
 
 export default function CharactersScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<SearchStackParamList>>();
-  const { data, status: queryStatus, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useCharacters();
+
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCharacters();
+  const status = useAppStore((s) => s.status);
   const setStatus = useAppStore((s) => s.setStatus);
+  const setSearchQuery = useAppStore((s) => s.setSearchQuery);
+  const resetFilters = useAppStore((s) => s.resetFilters);
+
+  const [localSearch, setLocalSearch] = React.useState('');
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(localSearch.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [localSearch, setSearchQuery]);
 
   const characters = data?.pages.flatMap((p) => p.results) ?? [];
   const totalCount = data?.pages[0]?.info.count ?? 0;
 
+  const handleEndReached = React.useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const renderItem = ({ item }: { item: Character }) => (
+    <CharacterCard
+      variant="list-row"
+      character={item}
+      onPress={() =>
+        navigation.navigate('CharacterDetail', { characterId: item.id })
+      }
+    />
+  );
+
+  if (isError) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['bottom']}>
+        <ErrorCard
+          onRetry={() => refetch()}
+          onGoHome={() => {
+            resetFilters();
+            refetch();
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Characters</Text>
-      <Text style={styles.subtitle}>Character list — coming soon</Text>
-
-      {/* TODO: Remove this data test block in Phase 6 when the real list screen is built */}
-      <Text style={styles.info}>Query status: {queryStatus}</Text>
-      <Text style={styles.info}>Total count: {totalCount}</Text>
-      <Text style={styles.info}>First character: {characters[0]?.name ?? '—'}</Text>
-      <Text style={styles.infoSecondary}>hasNextPage: {String(hasNextPage)}</Text>
-      <Text style={styles.infoSecondary}>isFetchingNextPage: {String(isFetchingNextPage)}</Text>
-      <Button
-        title="Load next page"
-        onPress={() => {
-          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-        }}
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <FlatList
+        data={isLoading ? [] : characters}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <SearchBarInput value={localSearch} onChangeText={setLocalSearch} />
+            <FilterTabs value={status} onChange={setStatus} />
+            {!isLoading && (
+              <Text style={styles.count}>{totalCount} characters</Text>
+            )}
+          </View>
+        }
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator color={colors.accent} style={styles.footer} />
+          ) : null
+        }
+        ListEmptyComponent={
+          isLoading ? (
+            <View>
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <View style={styles.separator} />}
+                  <SkeletonCard variant="list-row" />
+                </React.Fragment>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No characters found</Text>
+            </View>
+          )
+        }
       />
-      <Button title="Filter: Alive" onPress={() => setStatus('alive')} />
-
-      {/* TODO: Remove in Phase 6 when real list-row navigation is wired */}
-      <Button
-        title="Test: Go to Detail"
-        onPress={() => navigation.navigate('CharacterDetail', { characterId: 1 })}
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  header: {
+    gap: 12,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  count: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: colors.textSecondary,
+  },
+  separator: {
+    height: 12,
+  },
+  emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    paddingVertical: 48,
   },
-  title: {
+  emptyText: {
+    fontSize: 15,
+    fontFamily: 'Inter_600SemiBold',
     color: colors.textPrimary,
-    fontSize: 22,
-    fontFamily: 'Inter_700Bold',
   },
-  subtitle: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-  },
-  info: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-  },
-  infoSecondary: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontFamily: 'Inter_400Regular',
+  footer: {
+    paddingVertical: 16,
   },
 });
