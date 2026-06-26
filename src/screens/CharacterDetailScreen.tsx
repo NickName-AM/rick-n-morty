@@ -9,11 +9,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
-import { StatusBadge } from '../components';
+import { StatusBadge, EpisodeRow, ErrorCard } from '../components';
 import { useCharacterDetail } from '../hooks/useCharacterDetail';
 import { colors } from '../theme/colors';
-import type { HomeStackParamList } from '../navigation/types';
+import type { HomeStackParamList, RootTabParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'CharacterDetail'>;
 
@@ -37,10 +38,22 @@ function MetaRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function handleGoHome(navigation: Props['navigation']) {
+  navigation
+    .getParent<BottomTabNavigationProp<RootTabParamList>>()
+    ?.navigate('Home', { screen: 'Home' });
+}
+
 export default function CharacterDetailScreen({ route, navigation }: Props) {
   const { character, episodes, isLoading, isError, refetch } = useCharacterDetail(
     route.params.characterId,
   );
+
+  React.useEffect(() => {
+    if (character) {
+      navigation.setOptions({ title: character.name });
+    }
+  }, [character, navigation]);
 
   if (isLoading) {
     return (
@@ -50,8 +63,15 @@ export default function CharacterDetailScreen({ route, navigation }: Props) {
     );
   }
 
-  if (!character) {
-    return null;
+  if (isError || !character) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['bottom']}>
+        <ErrorCard
+          onRetry={() => refetch()}
+          onGoHome={() => handleGoHome(navigation)}
+        />
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -81,6 +101,16 @@ export default function CharacterDetailScreen({ route, navigation }: Props) {
           {character.type !== '' && (
             <MetaRow label="Type" value={character.type} />
           )}
+        </View>
+
+        <View style={styles.episodesHeader}>
+          <Text style={styles.sectionTitle}>Episodes</Text>
+          <Text style={styles.episodeCount}>{String(episodes.length)}</Text>
+        </View>
+        <View style={styles.episodeList}>
+          {episodes.map((ep) => (
+            <EpisodeRow key={ep.id} episode={ep} />
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -147,5 +177,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     flexShrink: 1,
     textAlign: 'right',
+  },
+  episodesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 28,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  episodeCount: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  episodeList: {
+    gap: 12,
   },
 });
