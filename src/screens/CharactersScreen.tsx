@@ -9,6 +9,7 @@ import {
   FilterTabs,
   SkeletonCard,
   ErrorCard,
+  SearchBarInput,
 } from '../components';
 import { useCharacters } from '../hooks/useCharacters';
 import { useAppStore } from '../store';
@@ -30,7 +31,15 @@ export default function CharactersScreen() {
   } = useCharacters();
   const status = useAppStore((s) => s.status);
   const setStatus = useAppStore((s) => s.setStatus);
+  const setSearchQuery = useAppStore((s) => s.setSearchQuery);
   const resetFilters = useAppStore((s) => s.resetFilters);
+
+  const [localSearch, setLocalSearch] = React.useState('');
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(localSearch.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [localSearch, setSearchQuery]);
 
   const characters = data?.pages.flatMap((p) => p.results) ?? [];
   const totalCount = data?.pages[0]?.info.count ?? 0;
@@ -75,6 +84,7 @@ export default function CharactersScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <View style={styles.header}>
+            <SearchBarInput value={localSearch} onChangeText={setLocalSearch} />
             <FilterTabs value={status} onChange={setStatus} />
             {!isLoading && (
               <Text style={styles.count}>{totalCount} characters</Text>

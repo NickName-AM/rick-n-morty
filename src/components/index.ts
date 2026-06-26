@@ -10,3 +10,5 @@ export { ErrorCard } from './ErrorCard';
 export type { ErrorCardProps } from './ErrorCard';
 export { SearchBarPressable } from './SearchBarPressable';
 export type { SearchBarPressableProps } from './SearchBarPressable';
+export { SearchBarInput } from './SearchBarInput';
+export type { SearchBarInputProps } from './SearchBarInput';
