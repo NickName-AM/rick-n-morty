@@ -1,65 +1,92 @@
-// Reused by both Home and Search stacks. Phase 7 will switch props to dual-stack-compatible typing.
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import { StatusBadge } from '../components';
+import { useCharacterDetail } from '../hooks/useCharacterDetail';
 import { colors } from '../theme/colors';
 import type { HomeStackParamList } from '../navigation/types';
-import { useCharacterDetail } from '../hooks/useCharacterDetail';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'CharacterDetail'>;
 
-export default function CharacterDetailScreen({ route }: Props) {
-  const { character, episodes, isLoading, isError } = useCharacterDetail(
+export default function CharacterDetailScreen({ route, navigation }: Props) {
+  const { character, episodes, isLoading, isError, refetch } = useCharacterDetail(
     route.params.characterId,
   );
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Character</Text>
-      <Text style={styles.body}>Character ID: {route.params.characterId}</Text>
-      <Text style={styles.subtitle}>Phase 7 — coming soon</Text>
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['bottom']}>
+        <ActivityIndicator color={colors.accent} style={styles.loader} />
+      </SafeAreaView>
+    );
+  }
 
-      {/* TODO: Remove this data test block in Phase 7 when the real detail screen is built */}
-      {isLoading && <Text style={styles.info}>Loading character…</Text>}
-      {isError && <Text style={styles.info}>Error loading character</Text>}
-      <Text style={styles.info}>Name: {character?.name ?? '—'}</Text>
-      <Text style={styles.infoSecondary}>Episodes: {episodes.length}</Text>
-    </View>
+  if (!character) {
+    return null;
+  }
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Image
+          source={{ uri: character.image }}
+          style={styles.avatar}
+          contentFit="cover"
+          placeholderContentFit="cover"
+          transition={300}
+        />
+        <View style={styles.headerRow}>
+          <Text style={styles.name}>{character.name}</Text>
+          <StatusBadge status={character.status} />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
     backgroundColor: colors.background,
-    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  loader: {
+    flex: 1,
     justifyContent: 'center',
-    gap: 8,
+    alignItems: 'center',
   },
-  title: {
+  avatar: {
+    width: '100%',
+    height: 280,
+    borderRadius: 18,
+    backgroundColor: colors.card,
+    marginTop: 16,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 18,
+  },
+  name: {
     color: colors.textPrimary,
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: 'Inter_700Bold',
-  },
-  body: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontFamily: 'Inter_400Regular',
-  },
-  subtitle: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-  },
-  info: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-  },
-  infoSecondary: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
+    flex: 1,
   },
 });
