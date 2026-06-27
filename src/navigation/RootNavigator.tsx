@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
@@ -15,12 +15,24 @@ import ProfileScreen from '../screens/ProfileScreen';
 // Activate native screen optimization before any navigator renders.
 enableScreens();
 
+const AppTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: colors.background,
+    card: colors.surface,
+    text: colors.textPrimary,
+    border: colors.border,
+    notification: colors.accent,
+  },
+};
+
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function RootNavigator() {
   return (
     <SafeAreaProvider>
-    <NavigationContainer>
+    <NavigationContainer theme={AppTheme}>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
