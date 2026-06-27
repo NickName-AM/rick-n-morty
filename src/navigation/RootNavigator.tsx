@@ -34,8 +34,8 @@ export default function RootNavigator() {
           name="Home"
           component={HomeStackNavigator}
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
             ),
           }}
         />
@@ -43,8 +43,8 @@ export default function RootNavigator() {
           name="Search"
           component={SearchStackNavigator}
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="search-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'search' : 'search-outline'} size={size} color={color} />
             ),
           }}
         />
@@ -57,8 +57,8 @@ export default function RootNavigator() {
             headerTintColor: colors.textPrimary,
             headerTitleStyle: { fontFamily: 'Inter_600SemiBold' },
             title: 'Saved',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="bookmark-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'bookmark' : 'bookmark-outline'} size={size} color={color} />
             ),
           }}
         />
@@ -71,8 +71,8 @@ export default function RootNavigator() {
             headerTintColor: colors.textPrimary,
             headerTitleStyle: { fontFamily: 'Inter_600SemiBold' },
             title: 'Profile',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
             ),
           }}
         />
