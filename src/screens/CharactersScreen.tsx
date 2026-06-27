@@ -3,6 +3,7 @@ import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 import {
   CharacterCard,
@@ -14,7 +15,7 @@ import {
 import { useCharacters } from '../hooks/useCharacters';
 import { useAppStore } from '../store';
 import { colors } from '../theme/colors';
-import type { SearchStackParamList } from '../navigation/types';
+import type { SearchStackParamList, RootTabParamList } from '../navigation/types';
 import type { Character } from '../types/api';
 
 export default function CharactersScreen() {
@@ -67,7 +68,7 @@ export default function CharactersScreen() {
           onRetry={() => refetch()}
           onGoHome={() => {
             resetFilters();
-            refetch();
+            navigation.getParent<BottomTabNavigationProp<RootTabParamList>>()?.navigate('Home', { screen: 'Home' });
           }}
         />
       </SafeAreaView>
