@@ -3,7 +3,6 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 export type HomeStackParamList = {
   Home: undefined;
   CharacterDetail: { characterId: number };
-  ComponentsShowcase: undefined;
 };
 
 export type SearchStackParamList = {
